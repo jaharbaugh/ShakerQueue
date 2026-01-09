@@ -5,6 +5,6 @@ import(
 )
 
 func main() {
-	fmt.Println("Starting your shift at 'ShakerQueue'")
-	
+	fmt.Println("Welcome to the ShakerQueue")
+
 }
