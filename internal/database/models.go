@@ -157,8 +157,8 @@ type CocktailRecipe struct {
 type Order struct {
 	ID           uuid.UUID
 	CreatedAt    time.Time
-	UserID       uuid.NullUUID
-	RecipeID     uuid.NullUUID
+	UserID       uuid.UUID
+	RecipeID     uuid.UUID
 	Status       Status
 	StartedAt    sql.NullTime
 	CompletedAt  sql.NullTime

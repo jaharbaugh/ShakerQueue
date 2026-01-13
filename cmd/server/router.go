@@ -12,6 +12,8 @@ func NewRouter(deps app.Dependencies) (http.Handler, error) {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/health", handlers.HandleHealth(deps))
-
+	mux.HandleFunc("/register", handlers.HandleRegisterUser(deps))
+	mux.HandleFunc("/login", handlers.HandleLogIn(deps))
+	
 	return mux, nil
 }

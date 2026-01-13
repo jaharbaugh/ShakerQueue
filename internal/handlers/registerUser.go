@@ -3,10 +3,12 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"github.com/alexedwards/argon2id"
+	//"github.com/alexedwards/argon2id"
 	"github.com/google/uuid"
 	"github.com/jaharbaugh/ShakerQueue/internal/app"
+	"github.com/jaharbaugh/ShakerQueue/internal/auth"
 	"github.com/jaharbaugh/ShakerQueue/internal/database"
+	"github.com/jaharbaugh/ShakerQueue/internal/models"
 	"net/http"
 )
 
@@ -18,12 +20,7 @@ func HandleRegisterUser(deps app.Dependencies) http.HandlerFunc {
 			return
 		}
 
-		type parameters struct {
-			username string `json:"username"`
-			email    string `json:"email"`
-			password string `json:"password"`
-		}
-		params := parameters{}
+		params := models.RegisterUserRequest{}
 
 		decoder := json.NewDecoder(req.Body)
 		err := decoder.Decode(&params)
@@ -32,7 +29,7 @@ func HandleRegisterUser(deps app.Dependencies) http.HandlerFunc {
 			return
 		}
 
-		hash, err := HashPassword(params.password)
+		hash, err := auth.HashPassword(params.Password)
 		if err != nil {
 			RespondWithError(w, http.StatusInternalServerError, "Could not hash password", err)
 			return
@@ -40,8 +37,8 @@ func HandleRegisterUser(deps app.Dependencies) http.HandlerFunc {
 
 		newUserParams := database.CreateUserParams{
 			ID:             uuid.New(),
-			Username:       params.username,
-			Email:          params.email,
+			Username:       params.Username,
+			Email:          params.Email,
 			Role:           database.UserRoleCustomer,
 			HashedPassword: hash,
 		}
@@ -54,13 +51,4 @@ func HandleRegisterUser(deps app.Dependencies) http.HandlerFunc {
 
 		RespondWithJSON(w, http.StatusOK, newUser)
 	}
-}
-
-func HashPassword(password string) (string, error) {
-	hash, err := argon2id.CreateHash(password, argon2id.DefaultParams)
-	if err != nil {
-		return "", err
-	}
-
-	return hash, nil
 }

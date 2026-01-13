@@ -35,8 +35,8 @@ RETURNING id, created_at, user_id, recipe_id, status, started_at, completed_at, 
 
 type CreateOrderParams struct {
 	ID       uuid.UUID
-	UserID   uuid.NullUUID
-	RecipeID uuid.NullUUID
+	UserID   uuid.UUID
+	RecipeID uuid.UUID
 }
 
 func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order, error) {
