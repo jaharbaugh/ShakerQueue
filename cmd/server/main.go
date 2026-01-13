@@ -21,6 +21,11 @@ func main() {
 	//Load .env values
 	_ = godotenv.Load(".env")
 
+	tokenSecret := os.Getenv("JWT_SECRET")
+	if tokenSecret == "" {
+	log.Fatal("JWT_SECRET must be set")
+	}
+	
 	//Connect to the database
 	pathToDB := os.Getenv("DATABASE_URL")
 	if pathToDB == "" {
@@ -60,6 +65,7 @@ func main() {
 		Queries:  database.New(db),
 		AMQPConn: connection,
 		AMQPChan: ch,
+		JWTSecret : tokenSecret,
 	}
 
 	router, err := NewRouter(deps)

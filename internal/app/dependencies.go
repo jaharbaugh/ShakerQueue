@@ -13,5 +13,6 @@ type Dependencies struct {
     Queries   *database.Queries   
     AMQPConn  *amqp.Connection
     AMQPChan  *amqp.Channel
+    JWTSecret *string
 }
 

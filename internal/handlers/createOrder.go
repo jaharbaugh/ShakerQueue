@@ -20,6 +20,11 @@ func HandleCreateOrder(deps app.Dependencies) http.HandlerFunc {
 			return
 		}
 
+		if !RequireRole(req, database.UserRoleAdmin, database.UserRoleCustomer) {
+			RespondWithError(w, http.StatusForbidden, "Insufficient permissions", nil)
+			return
+		}
+
 		newOrderRequest := models.CreateOrderRequest{}
 
 		decoder := json.NewDecoder(req.Body)
