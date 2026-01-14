@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"context"
+	//"context"
 	"net/http"
 	//"log"
 	"encoding/json"
@@ -29,17 +29,15 @@ func HandleLogIn(deps app.Dependencies) http.HandlerFunc {
 			return
 		}
 
-		dbUser, err := deps.Queries.GetUserByEmail(context.Background(), unverified_User.Email)
+		user, token, err := auth.AuthService(deps, unverified_User)
 		if err != nil {
-			RespondWithError(w, http.StatusBadRequest, "Invalid email or password", nil)
+			RespondWithError(w, http.StatusUnauthorized, "Email or Password Invalid", err)
 			return
 		}
 
-		match, err := auth.CheckPasswordHash(unverified_User.Password, dbUser.HashedPassword)
-		if match != true {
-			RespondWithError(w, http.StatusBadRequest, "Invalid email or password", nil)
-			return
-		}
-
+		RespondWithJSON(w, http.StatusOK, models.LogInResponse{
+			User:  user,
+			Token: token,
+		})
 	}
 }

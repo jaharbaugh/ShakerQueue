@@ -3,6 +3,6 @@ package auth
 type contextKey string
 
 const (
-    UserIDKey   contextKey = "userID"
-    UserRoleKey contextKey = "userRole"
+	UserIDKey   contextKey = "userID"
+	UserRoleKey contextKey = "userRole"
 )

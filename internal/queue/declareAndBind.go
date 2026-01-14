@@ -50,10 +50,3 @@ func DeclareAndBind(
 
 	return ch, q, err
 }
-
-type SimpleQueueType int
-
-const (
-	SimpleQueueDurable SimpleQueueType = iota
-	SimpleQueueTransient
-)

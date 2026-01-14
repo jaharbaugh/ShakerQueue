@@ -55,7 +55,7 @@ func HandleCreateOrder(deps app.Dependencies) http.HandlerFunc {
 
 		err = queue.PublishJSON(
 			deps.AMQPChan,
-			"orders",
+			queue.ExchangeDirect,
 			"order.created",
 			event,
 		)

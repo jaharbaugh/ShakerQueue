@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/google/uuid"
+	"github.com/jaharbaugh/ShakerQueue/internal/database"
 )
 
 type RegisterUserRequest struct {
@@ -15,6 +16,11 @@ type LogInRequest struct {
 	Password string `json:"password"`
 }
 
+type LogInResponse struct {
+	User  database.User `json:"user"`
+	Token string        `json:"token"`
+}
+
 type CreateOrderRequest struct {
 	OrderID   uuid.UUID `json:"order_id"`
 	RecipeID  uuid.UUID `json:"recipe_id"`
@@ -26,4 +32,8 @@ type CreateOrderEvent struct {
 	UserID    uuid.UUID 
 	RecipeID  uuid.UUID 
 	Quantity  int       
+}
+
+type OrderEvent struct{
+	
 }

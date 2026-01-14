@@ -67,7 +67,7 @@ func main() {
 		AMQPChan: ch,
 		JWTSecret : tokenSecret,
 	}
-
+	
 	router, err := NewRouter(deps)
 	if err != nil{
 		log.Fatalf("Could not create a new router: %v", err)
