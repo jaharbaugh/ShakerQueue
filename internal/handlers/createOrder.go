@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jaharbaugh/ShakerQueue/internal/app"
-	//"github.com/jaharbaugh/ShakerQueue/internal/auth"
+	"github.com/jaharbaugh/ShakerQueue/internal/auth"
 	"github.com/jaharbaugh/ShakerQueue/internal/database"
 	"github.com/jaharbaugh/ShakerQueue/internal/models"
 	"github.com/jaharbaugh/ShakerQueue/internal/queue"
@@ -17,6 +17,12 @@ func HandleCreateOrder(deps app.Dependencies) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		if req.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+		userID, ok := req.Context().Value(auth.UserIDKey).(uuid.UUID)
+		if !ok {
+			RespondWithError(w, http.StatusUnauthorized, "User not authenticated", nil)
 			return
 		}
 
@@ -34,10 +40,15 @@ func HandleCreateOrder(deps app.Dependencies) http.HandlerFunc {
 			return
 		}
 
+		cocktailRecipe, err := deps.Queries.GetRecipeByName(context.Background(), newOrderRequest.Name)
+		if err != nil {
+			RespondWithError(w, http.StatusBadRequest, "Could not find cocktail recipe", err)
+		}
+
 		newOrder, err := deps.Queries.CreateOrder(context.Background(), database.CreateOrderParams{
 			ID:       uuid.New(),
-			UserID:   uuid.New(), //Place holder
-			RecipeID: newOrderRequest.RecipeID,
+			UserID:   userID,
+			RecipeID: cocktailRecipe.ID,
 			//Quantity: newOrderRequest.Quantity,
 			//Status: database.StatusPending,
 		})

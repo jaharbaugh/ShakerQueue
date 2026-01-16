@@ -28,9 +28,9 @@ type LogInResponse struct {
 }
 
 type CreateOrderRequest struct {
-	OrderID   uuid.UUID `json:"order_id"`
-	RecipeID  uuid.UUID `json:"recipe_id"`
-	Quantity  int       `json:"quantity"`
+	//OrderID   uuid.UUID `json:"order_id"`
+	Name string `json:"name"`
+	//UserID: uuid.UUID `json:"user_id"`
 }
 
 type CreateOrderEvent struct {
@@ -38,6 +38,10 @@ type CreateOrderEvent struct {
 	UserID    uuid.UUID 
 	RecipeID  uuid.UUID 
 	Quantity  int       
+}
+
+type CreateOrderResponse struct{
+
 }
 
 type OrderEvent struct{

@@ -6,6 +6,8 @@ import(
 	"os"
 	"database/sql"
 	"errors"
+	"net/http"
+	"time"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/jaharbaugh/ShakerQueue/internal/queue"
 	"github.com/jaharbaugh/ShakerQueue/internal/handlers"
@@ -84,7 +86,12 @@ func main() {
 		}
 	
 	}
-
+	//Create Session State
+	sessionClient := app.Client{
+		BaseURL: urlAddress,
+		BearerToken: loginResponse.Token,
+		HTTPClient: &http.Client{Timeout: 10 * time.Second},
+	}
 
 	//Subscribe to Queue
 	err = queue.SubscribeJSON(
@@ -99,5 +106,13 @@ func main() {
 		log.Fatalf("failed to subscribe to queue: %v", err)
 	}
 	//Infinite Block
-	for{}
+	for{
+		newRequest := GetInput()
+		switch newRequest[0]{
+		case "create":
+			fmt.Println("What drink would you like?")
+			cocktail := GetInput()
+			CreatOrder(sessionClient, cocktail[0])
+		}
+	}
 }

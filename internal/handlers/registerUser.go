@@ -35,15 +35,15 @@ func HandleRegisterUser(deps app.Dependencies) http.HandlerFunc {
 			return
 		}
 		/*
-		var role database.UserRole
-		switch params.Role{
-		case "customer":
-			role = database.UserRoleCustomer
-		case "employee":
-			role = database.UserRoleEmployee
-		case "admin":
-			role = database.UserRoleAdmin
-		}*/
+			var role database.UserRole
+			switch params.Role{
+			case "customer":
+				role = database.UserRoleCustomer
+			case "employee":
+				role = database.UserRoleEmployee
+			case "admin":
+				role = database.UserRoleAdmin
+			}*/
 		newUserParams := database.CreateUserParams{
 			ID:             uuid.New(),
 			Username:       params.Username,
@@ -57,13 +57,13 @@ func HandleRegisterUser(deps app.Dependencies) http.HandlerFunc {
 			return
 		}
 
-		token, err :=  auth.CreateSession(deps, newUser)
+		token, err := auth.CreateSession(deps, newUser)
 		if err != nil {
 			RespondWithError(w, http.StatusInternalServerError, "Could not create new user session", err)
 			return
 		}
 		registrationResp := models.RegisterUserResponse{
-			User: newUser,
+			User:  newUser,
 			Token: token,
 		}
 

@@ -1,18 +1,17 @@
 package app
 
-import(
-    "database/sql"
+import (
+	"database/sql"
 
-    amqp "github.com/rabbitmq/amqp091-go"
+	amqp "github.com/rabbitmq/amqp091-go"
 
-    "github.com/jaharbaugh/ShakerQueue/internal/database"
+	"github.com/jaharbaugh/ShakerQueue/internal/database"
 )
 
 type Dependencies struct {
-    DB        *sql.DB
-    Queries   *database.Queries   
-    AMQPConn  *amqp.Connection
-    AMQPChan  *amqp.Channel
-    JWTSecret *string
+	DB        *sql.DB
+	Queries   *database.Queries
+	AMQPConn  *amqp.Connection
+	AMQPChan  *amqp.Channel
+	JWTSecret *string
 }
-
