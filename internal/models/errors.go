@@ -1,10 +1,9 @@
 package models
 
-import(
+import (
 	"errors"
 )
 
 var ErrInvalidCredentials = errors.New("Invalid Email or Password")
 
 var ErrUserNotFound = errors.New("User Not Found")
-

@@ -33,17 +33,24 @@ type CreateOrderRequest struct {
 	//UserID: uuid.UUID `json:"user_id"`
 }
 
+type UpdateUserRoleRequest struct {
+	UserID    uuid.UUID `json:"user_id"`
+	NewRole string        `json:"new_role"`
+}
+
+type UpdateUserRoleResponse struct {
+	Status string `json:"status"`
+}
+
 type CreateOrderEvent struct {
-	OrderID   uuid.UUID 
-	UserID    uuid.UUID 
-	RecipeID  uuid.UUID 
-	Quantity  int       
+	OrderID  uuid.UUID
+	UserID   uuid.UUID
+	RecipeID uuid.UUID
+	Quantity int
 }
 
-type CreateOrderResponse struct{
-
+type CreateOrderResponse struct {
 }
 
-type OrderEvent struct{
-
+type OrderEvent struct {
 }
