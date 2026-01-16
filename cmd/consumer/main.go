@@ -5,13 +5,15 @@ import(
 	"log"
 	"os"
 	"database/sql"
+	"errors"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/jaharbaugh/ShakerQueue/internal/queue"
 	"github.com/jaharbaugh/ShakerQueue/internal/handlers"
 	"github.com/jaharbaugh/ShakerQueue/internal/app"
 	"github.com/jaharbaugh/ShakerQueue/internal/database"
+	"github.com/jaharbaugh/ShakerQueue/internal/models"
 )
-
+const urlAddress = "http://localhost:8080"
 func main() {
 	fmt.Println("Welcome to the ShakerQueue")
 	
@@ -44,25 +46,45 @@ func main() {
 	}
 
 	defer db.Close()
-	empty := ""
+	//empty := ""
 	deps := app.Dependencies{
 		DB:       db,
 		Queries:  database.New(db),
 		AMQPConn: connection,
 		AMQPChan: ch,
-		JWTSecret : &empty,
+		JWTSecret : nil,
 	}
 	//Prompt Login
-	creds, err := ConsumerWelcome()
+	loginCreds, err := ConsumerWelcome()
 	if err != nil {
 		log.Fatalf("Could not find credentials: %v", err)
 	}
 
 	//Request Login from Server
-	loginResponse, err := Login("http://localhost:8080", creds)
+	loginResponse, err := Login(urlAddress, loginCreds)
 	if err != nil{
-		log.Fatal(err)
+		if errors.Is(err, models.ErrUserNotFound){
+			fmt.Println("No account found. Registering new user:")
+			username, err := ConsumerGetNewUsername()
+			registerCreds := models.RegisterUserRequest{
+				Username:	username,
+				Email:	loginCreds.Email,
+				Password: loginCreds.Password,
+			}
+			regResp, err := RegisterUser(urlAddress, registerCreds)
+			if err != nil {
+				log.Fatalf("registration failed: %v", err)
+			}
+			loginResponse = &models.LogInResponse{
+				User:  regResp.User,
+				Token: regResp.Token,
+			}
+		} else {
+		log.Fatalf("login failed: %v", err)
+		}
+	
 	}
+
 
 	//Subscribe to Queue
 	err = queue.SubscribeJSON(
@@ -73,6 +95,9 @@ func main() {
 		queue.SimpleQueueDurable,
 		handlers.HandleProcessOrder(deps),
 	)
+	if err != nil {
+		log.Fatalf("failed to subscribe to queue: %v", err)
+	}
 	//Infinite Block
 	for{}
 }

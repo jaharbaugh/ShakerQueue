@@ -20,21 +20,26 @@ func HandleLogIn(deps app.Dependencies) http.HandlerFunc {
 			return
 		}
 
-		unverified_User := models.LogInRequest{}
+		unverifiedUser := models.LogInRequest{}
 
 		decoder := json.NewDecoder(req.Body)
-		err := decoder.Decode(&unverified_User)
+		err := decoder.Decode(&unverifiedUser)
 		if err != nil {
 			RespondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters", err)
 			return
 		}
 
-		user, token, err := auth.AuthService(deps, unverified_User)
+		user, err := auth.AuthenticateUser(deps, unverifiedUser)
 		if err != nil {
-			RespondWithError(w, http.StatusUnauthorized, "Email or Password Invalid", err)
+			RespondWithError(w, http.StatusUnauthorized, "Invalid Email or Password", err)
 			return
 		}
 
+		token, err := auth.CreateSession(deps, user)
+		if err != nil {
+			RespondWithError(w, http.StatusInternalServerError, "Could not create new user session", err)
+			return
+		}
 		RespondWithJSON(w, http.StatusOK, models.LogInResponse{
 			User:  user,
 			Token: token,

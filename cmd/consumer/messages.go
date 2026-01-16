@@ -32,6 +32,12 @@ func ConsumerWelcome() (models.LogInRequest, error) {
 	return creds, nil
 }
 
+func ConsumerGetNewUsername() (string, error){
+	fmt.Println("Please enter your desired username:")
+	username := GetInput()
+	return username[0], nil
+}
+
 func PrintServerHelp() {
 	fmt.Println("Possible commands:")
 	fmt.Println("* pause")

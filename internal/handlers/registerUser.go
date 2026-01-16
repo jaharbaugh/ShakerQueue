@@ -34,7 +34,16 @@ func HandleRegisterUser(deps app.Dependencies) http.HandlerFunc {
 			RespondWithError(w, http.StatusInternalServerError, "Could not hash password", err)
 			return
 		}
-
+		/*
+		var role database.UserRole
+		switch params.Role{
+		case "customer":
+			role = database.UserRoleCustomer
+		case "employee":
+			role = database.UserRoleEmployee
+		case "admin":
+			role = database.UserRoleAdmin
+		}*/
 		newUserParams := database.CreateUserParams{
 			ID:             uuid.New(),
 			Username:       params.Username,
@@ -42,13 +51,22 @@ func HandleRegisterUser(deps app.Dependencies) http.HandlerFunc {
 			Role:           database.UserRoleCustomer,
 			HashedPassword: hash,
 		}
-
 		newUser, err := deps.Queries.CreateUser(context.Background(), newUserParams)
 		if err != nil {
 			RespondWithError(w, http.StatusInternalServerError, "Could not register new user", err)
 			return
 		}
 
-		RespondWithJSON(w, http.StatusOK, newUser)
+		token, err :=  auth.CreateSession(deps, newUser)
+		if err != nil {
+			RespondWithError(w, http.StatusInternalServerError, "Could not create new user session", err)
+			return
+		}
+		registrationResp := models.RegisterUserResponse{
+			User: newUser,
+			Token: token,
+		}
+
+		RespondWithJSON(w, http.StatusOK, registrationResp)
 	}
 }

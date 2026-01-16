@@ -9,6 +9,12 @@ type RegisterUserRequest struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	//Role	string	`json:"role"`
+}
+
+type RegisterUserResponse struct {
+	User  database.User `json:"user"`
+	Token string        `json:"token"`
 }
 
 type LogInRequest struct {
@@ -35,5 +41,5 @@ type CreateOrderEvent struct {
 }
 
 type OrderEvent struct{
-	
+
 }
