@@ -3,16 +3,13 @@ package main
 import(
 	"fmt"
 	"log"
-	//"os"
-	//"database/sql"
 	"errors"
 	"net/http"
 	"time"
 
 	_ "github.com/lib/pq"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/jaharbaugh/ShakerQueue/internal/queue"
-	//"github.com/jaharbaugh/ShakerQueue/internal/handlers"
+	//"github.com/jaharbaugh/ShakerQueue/internal/queue"
 	"github.com/jaharbaugh/ShakerQueue/internal/app"
 	"github.com/jaharbaugh/ShakerQueue/internal/database"
 	"github.com/jaharbaugh/ShakerQueue/internal/models"
@@ -33,32 +30,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Could not open new channel on the connection: %v", err)
 	}
-/*
-	//Connect to the database
-	pathToDB := os.Getenv("DATABASE_URL")
-	if pathToDB == "" {
-		log.Fatal("DATABASE_URL must be set")
-	}
-	//Open PSQL database
-	db, err := sql.Open("postgres", pathToDB)
-	if err != nil {
-		log.Fatalf("Could not open Postgresql database: %v", err)
-	}
-	err = db.Ping()
-	if err != nil {
-		log.Fatalf("Could not connect to database: %v", err)
-	}
 
-	defer db.Close()
-
-	deps := app.ConsumerDependencies{
-		//DB:       db,
-		//Queries:  database.New(db),
-		AMQPConn: connection,
-		AMQPChan: ch,
-		//JWTSecret : nil,
-	}
-*/
 	//Prompt Login
 	loginCreds, err := ConsumerWelcome()
 	if err != nil {
@@ -102,39 +74,76 @@ func main() {
 	//Infinite Block
 	
 		switch loginResponse.User.Role{
+		case database.UserRoleAdmin:
+			for {
+				PrintAdminCommands()
+				newRequest:= GetInput()
+				switch newRequest[0]{
+				case "health":
+					fmt.Println("Checking Server Health")
+					health, err := Health(sessionClient)
+					if err != nil{
+						log.Fatalf("Could not get health info: %v", err)
+					}
+					fmt.Sprintf(health)
+					fmt.Println("------")
+					//continue
+				case "list":
+					// TODO: implement
+				case "role":
+					// TODO: implement
+				case "exit":
+					// TODO: implement
+				case "customer":
+					PrintCustomerHelp()
+					continue
+				case "employee":
+					PrintEmployeeHelp()
+					continue
+			}
+		}
 		case database.UserRoleCustomer:
 			for {
 				PrintCustomerCommands()
 				newRequest := GetInput()
 				switch newRequest[0]{
-				case "create":
+				case "menu":
+					// TODO: implement
+				case "order":
 					fmt.Println("What drink would you like?")
 					cocktail := GetInput()
 					CreateOrder(sessionClient, cocktail[0])
 					fmt.Println("Order Created Successfully")
 				case "status":
+					// TODO: implement
 				case "exit":
+					// TODO: implement
 				case "help":
 					PrintCustomerHelp()
 					continue
 				}
 			}
 		case database.UserRoleEmployee:
-			fmt.Println("Employee ready. Waiting for orders...")
-			//Subscribe to Queue
-			err = queue.SubscribeJSON(
-				connection,
-				queue.ExchangeDirect,
-				//"orders."+loginResponse.User.ID.String(),
-				"orders.employee",      
-				"orders.created",
-				queue.SimpleQueueDurable,
-				ProcessOrder(sessionClient),
-			)
-			if err != nil {
-				log.Fatalf("Failed to subscribe: %v", err)
+			for {
+				PrintEmployeeCommands()
+				newRequest := GetInput()
+				switch newRequest[0]{
+				case "make":
+					err := JoinQueue(sessionClient)
+					if err != nil{
+						log.Fatalf("Could not subscribe: %v", err)
+					}
+				case "add":
+					// TODO: implement
+				case "status":
+					// TODO: implement
+				case "exit":
+					// TODO: implement
+				case "help":
+					PrintEmployeeHelp()
+					continue
+				}
 			}
-			select {}
+		default: select {}
 		}
-
 }

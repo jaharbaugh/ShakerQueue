@@ -40,12 +40,73 @@ func ConsumerGetNewUsername() (string, error){
 
 func PrintCustomerCommands() {
 	fmt.Println("Possible commands:")
-	fmt.Println("* create")
+	fmt.Println("* menu")
+	fmt.Println("* order")
 	fmt.Println("* status")
 	fmt.Println("* exit")
 	fmt.Println("* help")
 }
 
+func PrintCustomerHelp() {
+	fmt.Println("Possible commands:")
+	fmt.Println("* menu:")
+	fmt.Println("    view all cocktails available to order")
+	fmt.Println("* order: ")
+	fmt.Println("    adds a new order to the queue")
+	fmt.Println("    Only one drink at a time, please")
+	fmt.Println("* status:")
+	fmt.Println("    checks the status of all orders under your ID")
+	fmt.Println("* exit:")
+	fmt.Println(" 	  exits the client")
+	fmt.Println("* help:")
+	fmt.Println("     prints the help menu")
+}
+
+func PrintEmployeeCommands() {
+	fmt.Println("Possible commands:")
+	fmt.Println("* make")
+	fmt.Println("* add")
+	fmt.Println("* exit")
+	fmt.Println("* help")
+}
+
+func PrintEmployeeHelp() {
+	fmt.Println("Possible commands:")
+	fmt.Println("* make: ")
+	fmt.Println("    subscribes to the queue of active orders")
+	fmt.Println("    Only one drink at a time, please")
+	fmt.Println("* add:")
+	fmt.Println("    creates new cocktail recipes to be ordered")
+	fmt.Println("* exit:")
+	fmt.Println(" 	  exits the client")
+	fmt.Println("* help:")
+	fmt.Println("     prints the help menu")
+}
+
+func PrintAdminCommands() {
+	fmt.Println("Possible commands:")
+	fmt.Println("* health")
+	fmt.Println("* list")
+	fmt.Println("* role")
+	fmt.Println("* exit")
+	fmt.Println("* customer")
+	fmt.Println("* employee")
+}
+func PrintAdminHelp() {
+	fmt.Println("Possible commands:")
+	fmt.Println("* health: ")
+	fmt.Println("    view server health data")
+	fmt.Println("* list:")
+	fmt.Println("    List all order and their status")
+	fmt.Println("* role:")
+	fmt.Println(" 	  Change the role of user by their ID")
+	fmt.Println("* exit:")
+	fmt.Println(" 	  exits the client")
+	fmt.Println("* customer:")
+	fmt.Println("     prints customer commands")
+	fmt.Println("* employee:")
+	fmt.Println("     prints employee commands")
+}
 func GetInput() []string {
 	fmt.Print("> ")
 	scanner := bufio.NewScanner(os.Stdin)
@@ -58,15 +119,3 @@ func GetInput() []string {
 	return strings.Fields(line)
 }
 
-func PrintCustomerHelp() {
-	fmt.Println("Possible commands:")
-	fmt.Println("* create: ")
-	fmt.Println("    adds a new order to the queue")
-	fmt.Println("    Only one drink at a time, please")
-	fmt.Println("* status:")
-	fmt.Println("    checks the status of all orders under your ID")
-	fmt.Println("* exit:")
-	fmt.Println(" 	  exits the client")
-	fmt.Println("* help:")
-	fmt.Println("     prints the help menu")
-}

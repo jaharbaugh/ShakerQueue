@@ -12,7 +12,7 @@ func NewRouter(deps app.Dependencies) (http.Handler, error) {
 	mux := http.NewServeMux()
 
 	//Admin Endpoints
-	mux.HandleFunc("/health", handlers.HandleHealth(deps))
+	mux.HandleFunc("/health", handlers.AuthMiddleware(deps, handlers.HandleHealth(deps)))
 	mux.HandleFunc("/role/set", handlers.AuthMiddleware(deps, handlers.HandleUpdateUserRole(deps)))
 	
 	//Customer Endpoints
