@@ -38,11 +38,11 @@ func ConsumerGetNewUsername() (string, error){
 	return username[0], nil
 }
 
-func PrintServerHelp() {
+func PrintCustomerCommands() {
 	fmt.Println("Possible commands:")
-	fmt.Println("* pause")
-	fmt.Println("* resume")
-	fmt.Println("* quit")
+	fmt.Println("* create")
+	fmt.Println("* status")
+	fmt.Println("* exit")
 	fmt.Println("* help")
 }
 
@@ -58,18 +58,15 @@ func GetInput() []string {
 	return strings.Fields(line)
 }
 
-func PrintConsumerHelp() {
+func PrintCustomerHelp() {
 	fmt.Println("Possible commands:")
-	fmt.Println("* move <location> <unitID> <unitID> <unitID>...")
-	fmt.Println("    example:")
-	fmt.Println("    move asia 1")
-	fmt.Println("* spawn <location> <rank>")
-	fmt.Println("    example:")
-	fmt.Println("    spawn europe infantry")
-	fmt.Println("* status")
-	fmt.Println("* spam <n>")
-	fmt.Println("    example:")
-	fmt.Println("    spam 5")
-	fmt.Println("* quit")
-	fmt.Println("* help")
+	fmt.Println("* create: ")
+	fmt.Println("    adds a new order to the queue")
+	fmt.Println("    Only one drink at a time, please")
+	fmt.Println("* status:")
+	fmt.Println("    checks the status of all orders under your ID")
+	fmt.Println("* exit:")
+	fmt.Println(" 	  exits the client")
+	fmt.Println("* help:")
+	fmt.Println("     prints the help menu")
 }

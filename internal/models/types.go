@@ -42,7 +42,11 @@ type UpdateUserRoleResponse struct {
 	Status string `json:"status"`
 }
 
-type CreateOrderEvent struct {
+type ProcessOrderRequest struct {
+	OrderID	uuid.UUID `json:"order_id"`
+}
+
+type OrderEvent struct {
 	OrderID  uuid.UUID
 	UserID   uuid.UUID
 	RecipeID uuid.UUID
@@ -52,5 +56,3 @@ type CreateOrderEvent struct {
 type CreateOrderResponse struct {
 }
 
-type OrderEvent struct {
-}

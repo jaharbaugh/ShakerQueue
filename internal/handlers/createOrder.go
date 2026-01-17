@@ -39,12 +39,12 @@ func HandleCreateOrder(deps app.Dependencies) http.HandlerFunc {
 			RespondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters", err)
 			return
 		}
-
+		
 		cocktailRecipe, err := deps.Queries.GetRecipeByName(context.Background(), newOrderRequest.Name)
 		if err != nil {
 			RespondWithError(w, http.StatusBadRequest, "Could not find cocktail recipe", err)
 		}
-
+		
 		newOrder, err := deps.Queries.CreateOrder(context.Background(), database.CreateOrderParams{
 			ID:       uuid.New(),
 			UserID:   userID,
@@ -57,7 +57,7 @@ func HandleCreateOrder(deps app.Dependencies) http.HandlerFunc {
 			return
 		}
 
-		event := models.CreateOrderEvent{
+		event := models.OrderEvent{
 			OrderID:  newOrder.ID,
 			UserID:   newOrder.UserID,
 			RecipeID: newOrder.RecipeID,

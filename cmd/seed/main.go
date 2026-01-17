@@ -4,10 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	
 	"github.com/google/uuid"
 	"github.com/jaharbaugh/ShakerQueue/internal/app"
+	"github.com/jaharbaugh/ShakerQueue/internal/auth"
 	"github.com/jaharbaugh/ShakerQueue/internal/database"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 	"log"
 	"os"
 )
@@ -37,6 +40,11 @@ func main() {
 	deps := app.Dependencies{
 		DB:      db,
 		Queries: database.New(db),
+	}
+
+	err = deps.Queries.ResetDatabase(context.Background())
+	if err != nil{
+		log.Fatal("Could not reset database")
 	}
 
 	baseCocktails := []database.CreateCocktailRecipeParams{
@@ -85,6 +93,39 @@ func main() {
 		}
 	}
 
-	log.Println("Seeded cocktail recipes successfully.")
+	baseUsers := []database.CreateUserParams{
+		{	ID:             uuid.New(),
+			Username:       "admin",
+			Email:          "admin@admin.com",
+			Role:           database.UserRoleAdmin,
+			HashedPassword: "admin",
+		},
+		{	ID:             uuid.New(),
+			Username:       "james",
+			Email:          "james@james.com",
+			Role:           database.UserRoleEmployee,
+			HashedPassword: "james",
+		},
+		{	ID:             uuid.New(),
+			Username:       "chunk",
+			Email:          "chunk@chunk.com",
+			Role:           database.UserRoleCustomer,
+			HashedPassword: "chunk",
+		},
+	}
+	for _, user := range baseUsers {
+    	hashed, err := auth.HashPassword(user.HashedPassword)
+    	if err != nil {
+        	log.Fatalf("Failed to hash password for %s: %v", user.Username, err)
+    	}
+    	user.HashedPassword = hashed
+
+    	_, err = deps.Queries.CreateUser(context.Background(), user)
+    	if err != nil {
+        	log.Fatalf("Failed to insert %s: %v", user.Username, err)
+    	}
+	}
+
+	log.Println("Seeded database successfully.")
 
 }

@@ -19,7 +19,9 @@ func main() {
 	fmt.Println("Your shift starts now")
 
 	//Load .env values
-	_ = godotenv.Load(".env")
+	if err := godotenv.Load(); err != nil {
+	log.Println("No .env file found, relying on environment variables")
+	}
 
 	tokenSecret := os.Getenv("JWT_SECRET")
 	if tokenSecret == "" {
@@ -65,9 +67,9 @@ func main() {
 		Queries:  database.New(db),
 		AMQPConn: connection,
 		AMQPChan: ch,
-		JWTSecret : tokenSecret,
+		JWTSecret : &tokenSecret,
 	}
-	
+
 	router, err := NewRouter(deps)
 	if err != nil{
 		log.Fatalf("Could not create a new router: %v", err)

@@ -6,7 +6,7 @@ import (
 	"time"
 	"fmt"
 	"bytes"
-	"context"
+	//"context"
 
 	//"github.com/jaharbaugh/ShakerQueue/internal/database"
 	"github.com/jaharbaugh/ShakerQueue/internal/models"
@@ -87,7 +87,7 @@ func RegisterUser(serverURL string, creds models.RegisterUserRequest) (*models.R
 
 func CreateOrder(sessionClient app.Client, cocktail string) (*models.CreateOrderResponse, error) {
 
-	params := models.CreateOrderParams{
+	params := models.CreateOrderRequest{
 		Name: cocktail,
 	}
 
@@ -98,7 +98,7 @@ func CreateOrder(sessionClient app.Client, cocktail string) (*models.CreateOrder
 
     req, err := http.NewRequest(
         http.MethodPost,
-        sessionClient.BaseURL+"/createorder",
+        sessionClient.BaseURL+"order/create",
         bytes.NewBuffer(body),
     )
     if err != nil {

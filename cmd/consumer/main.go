@@ -3,14 +3,16 @@ package main
 import(
 	"fmt"
 	"log"
-	"os"
-	"database/sql"
+	//"os"
+	//"database/sql"
 	"errors"
 	"net/http"
 	"time"
+
+	_ "github.com/lib/pq"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/jaharbaugh/ShakerQueue/internal/queue"
-	"github.com/jaharbaugh/ShakerQueue/internal/handlers"
+	//"github.com/jaharbaugh/ShakerQueue/internal/handlers"
 	"github.com/jaharbaugh/ShakerQueue/internal/app"
 	"github.com/jaharbaugh/ShakerQueue/internal/database"
 	"github.com/jaharbaugh/ShakerQueue/internal/models"
@@ -31,7 +33,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Could not open new channel on the connection: %v", err)
 	}
-
+/*
 	//Connect to the database
 	pathToDB := os.Getenv("DATABASE_URL")
 	if pathToDB == "" {
@@ -48,14 +50,15 @@ func main() {
 	}
 
 	defer db.Close()
-	//empty := ""
-	deps := app.Dependencies{
-		DB:       db,
-		Queries:  database.New(db),
+
+	deps := app.ConsumerDependencies{
+		//DB:       db,
+		//Queries:  database.New(db),
 		AMQPConn: connection,
 		AMQPChan: ch,
-		JWTSecret : nil,
+		//JWTSecret : nil,
 	}
+*/
 	//Prompt Login
 	loginCreds, err := ConsumerWelcome()
 	if err != nil {
@@ -91,28 +94,47 @@ func main() {
 		BaseURL: urlAddress,
 		BearerToken: loginResponse.Token,
 		HTTPClient: &http.Client{Timeout: 10 * time.Second},
+		AMQPChan: ch,
+		AMQPConn: connection,
 	}
 
-	//Subscribe to Queue
-	err = queue.SubscribeJSON(
-		connection,
-		queue.ExchangeDirect,
-		"orders."+loginResponse.User.ID.String(),
-		"orders.created",
-		queue.SimpleQueueDurable,
-		handlers.HandleProcessOrder(deps),
-	)
-	if err != nil {
-		log.Fatalf("failed to subscribe to queue: %v", err)
-	}
+	
 	//Infinite Block
-	for{
-		newRequest := GetInput()
-		switch newRequest[0]{
-		case "create":
-			fmt.Println("What drink would you like?")
-			cocktail := GetInput()
-			CreatOrder(sessionClient, cocktail[0])
+	
+		switch loginResponse.User.Role{
+		case database.UserRoleCustomer:
+			for {
+				PrintCustomerCommands()
+				newRequest := GetInput()
+				switch newRequest[0]{
+				case "create":
+					fmt.Println("What drink would you like?")
+					cocktail := GetInput()
+					CreateOrder(sessionClient, cocktail[0])
+					fmt.Println("Order Created Successfully")
+				case "status":
+				case "exit":
+				case "help":
+					PrintCustomerHelp()
+					continue
+				}
+			}
+		case database.UserRoleEmployee:
+			fmt.Println("Employee ready. Waiting for orders...")
+			//Subscribe to Queue
+			err = queue.SubscribeJSON(
+				connection,
+				queue.ExchangeDirect,
+				//"orders."+loginResponse.User.ID.String(),
+				"orders.employee",      
+				"orders.created",
+				queue.SimpleQueueDurable,
+				ProcessOrder(sessionClient),
+			)
+			if err != nil {
+				log.Fatalf("Failed to subscribe: %v", err)
+			}
+			select {}
 		}
-	}
+
 }
