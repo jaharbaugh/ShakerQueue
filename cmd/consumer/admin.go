@@ -1,7 +1,7 @@
 package main
 
 import (
-	//"encoding/json"
+	"encoding/json"
 	"net/http"
 	//"time"
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	//"context"
 
 	//"github.com/jaharbaugh/ShakerQueue/internal/database"
-	//"github.com/jaharbaugh/ShakerQueue/internal/models"
+	"github.com/jaharbaugh/ShakerQueue/internal/models"
 	"github.com/jaharbaugh/ShakerQueue/internal/app"
 )
 
@@ -44,15 +44,45 @@ func Health(sessionClient app.Client) (string, error) {
 
 	bodyString := string(bodyBytes)
 
-	fmt.Println("Server Health Status:")
-	fmt.Printf(bodyString)
-
 	return bodyString, nil
 
 }
 
-func UpdateUserRole(){
+func UpdateUserRole(sessionClient app.Client, email, newRole string) error{
+	
+	params := models.UpdateUserRoleRequest{
+		Email: email,
+		NewRole: newRole,
+	}
 
+	body, err := json.Marshal(params)
+    if err != nil {
+        return err
+    }
+	
+	req, err := http.NewRequest(
+        http.MethodPost,
+        sessionClient.BaseURL+"/role/set",
+        bytes.NewBuffer(body),
+    )
+    if err != nil {
+        return err
+    }
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+ sessionClient.BearerToken)
+
+	resp, err := sessionClient.HTTPClient.Do(req)
+    if err != nil {
+        return err
+    }
+    defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+        return fmt.Errorf("User role update failed: %s", resp.Status)
+    }
+
+	return nil
 }
 
 func ListOrders(){

@@ -34,7 +34,7 @@ type CreateOrderRequest struct {
 }
 
 type UpdateUserRoleRequest struct {
-	UserID    uuid.UUID `json:"user_id"`
+	Email    string `json:"email"`
 	NewRole string        `json:"new_role"`
 }
 
@@ -45,6 +45,7 @@ type UpdateUserRoleResponse struct {
 type ProcessOrderRequest struct {
 	OrderID	uuid.UUID `json:"order_id"`
 }
+
 
 type OrderEvent struct {
 	OrderID  uuid.UUID

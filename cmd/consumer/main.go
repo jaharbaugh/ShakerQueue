@@ -87,19 +87,27 @@ func main() {
 					}
 					fmt.Sprintf(health)
 					fmt.Println("------")
-					//continue
+					
 				case "list":
 					// TODO: implement
 				case "role":
-					// TODO: implement
+					fmt.Println("What is the user's email?")
+					email := GetInput()
+					fmt.Println("What is their new role?")
+					newRole := GetInput()
+					err := UpdateUserRole(sessionClient, email[0], newRole[0])
+					if err != nil{
+						fmt.Printf("Could not upadate user role: %v \n", err)
+						return
+					}
 				case "exit":
-					// TODO: implement
+					return
 				case "customer":
 					PrintCustomerHelp()
-					continue
+					
 				case "employee":
 					PrintEmployeeHelp()
-					continue
+					
 			}
 		}
 		case database.UserRoleCustomer:
@@ -117,10 +125,10 @@ func main() {
 				case "status":
 					// TODO: implement
 				case "exit":
-					// TODO: implement
+					return
 				case "help":
 					PrintCustomerHelp()
-					continue
+					
 				}
 			}
 		case database.UserRoleEmployee:
@@ -138,10 +146,10 @@ func main() {
 				case "status":
 					// TODO: implement
 				case "exit":
-					// TODO: implement
+					return
 				case "help":
 					PrintEmployeeHelp()
-					continue
+					
 				}
 			}
 		default: select {}

@@ -41,13 +41,19 @@ func HandleUpdateUserRole(deps app.Dependencies) http.HandlerFunc {
 			return
 		}
 
+		user, err := deps.Queries.GetUserByEmail(req.Context(), newUserRoleRequest.Email)
+				if err != nil {
+					RespondWithError(w, http.StatusInternalServerError, "Could not alter user role", err)
+					return
+				}
+
 		switch newUserRoleRequest.NewRole{
 		case "employee": 
 				err := deps.Queries.UpdateUserRole(
 					req.Context(), 
 					database.UpdateUserRoleParams{
 						Role: database.UserRoleEmployee,
-						ID: newUserRoleRequest.UserID,
+						ID: user.ID,
 					})
 				if err != nil {
 					RespondWithError(w, http.StatusInternalServerError, "Could not alter user role", err)
@@ -59,7 +65,18 @@ func HandleUpdateUserRole(deps app.Dependencies) http.HandlerFunc {
 					req.Context(), 
 					database.UpdateUserRoleParams{
 						Role: database.UserRoleAdmin,
-						ID: newUserRoleRequest.UserID,
+						ID: user.ID,
+					})
+				if err != nil {
+					RespondWithError(w, http.StatusInternalServerError, "Could not alter user role", err)
+					return
+				}
+		case "customer": 
+				err := deps.Queries.UpdateUserRole(
+					req.Context(), 
+					database.UpdateUserRoleParams{
+						Role: database.UserRoleAdmin,
+						ID: user.ID,
 					})
 				if err != nil {
 					RespondWithError(w, http.StatusInternalServerError, "Could not alter user role", err)
