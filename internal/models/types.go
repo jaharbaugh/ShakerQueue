@@ -45,7 +45,13 @@ type UpdateUserRoleResponse struct {
 type ProcessOrderRequest struct {
 	OrderID	uuid.UUID `json:"order_id"`
 }
+type ListOrderResponse struct {
+	Orders	[]database.Order	`json:"orders"`
+}
 
+type ListMenuResponse struct {
+	Menu	[]database.CocktailRecipe	`json:"menu"`
+}
 
 type OrderEvent struct {
 	OrderID  uuid.UUID

@@ -89,7 +89,21 @@ func main() {
 					fmt.Println("------")
 					
 				case "list":
-					// TODO: implement
+					fmt.Println("Fetching all orders")
+					orders, err := ListOrders(sessionClient)
+					if err != nil{
+						fmt.Printf("Could not retrieve orders: %v \n", err)
+						return
+					}
+
+					for _, order := range orders.Orders{
+						fmt.Printf("%v\n", order.ID)
+						fmt.Printf("%v\n", order.Status)
+						fmt.Printf("%v\n", order.CreatedAt)
+						fmt.Printf("%v\n", order.RecipeID)
+						fmt.Printf("%v\n", order.UserID)
+						fmt.Println("-------")
+					}
 				case "role":
 					fmt.Println("What is the user's email?")
 					email := GetInput()
@@ -100,6 +114,7 @@ func main() {
 						fmt.Printf("Could not upadate user role: %v \n", err)
 						return
 					}
+					fmt.Println("User role updated successfuly")
 				case "exit":
 					return
 				case "customer":
@@ -116,7 +131,18 @@ func main() {
 				newRequest := GetInput()
 				switch newRequest[0]{
 				case "menu":
-					// TODO: implement
+					fmt.Println("Fetching all menu items")
+					recipes, err := GetRecpies(sessionClient)
+					if err != nil{
+						fmt.Printf("Could not retrieve menu: %v \n", err)
+						return
+					}
+
+					for _, recipe := range recipes.Menu{
+						//fmt.Printf("%v\n", recipe.ID)
+						fmt.Printf("%v\n", recipe.Name)
+						fmt.Println("-------")
+					}
 				case "order":
 					fmt.Println("What drink would you like?")
 					cocktail := GetInput()

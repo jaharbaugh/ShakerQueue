@@ -85,6 +85,35 @@ func UpdateUserRole(sessionClient app.Client, email, newRole string) error{
 	return nil
 }
 
-func ListOrders(){
+
+func ListOrders(sessionClient app.Client) (models.ListOrderResponse, error) {
+    req, err := http.NewRequest(
+        http.MethodGet,
+        sessionClient.BaseURL+"/orders/list",
+        bytes.NewBuffer(nil),
+    )
+    if err != nil {
+        return models.ListOrderResponse{}, err
+    }
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+ sessionClient.BearerToken)
+
+	resp, err := sessionClient.HTTPClient.Do(req)
+    if err != nil {
+        return models.ListOrderResponse{}, err
+    }
+    defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+        return models.ListOrderResponse{}, fmt.Errorf("Order Retrieval Failed: %s", resp.Status)
+    }
+
+	var listOrderResp models.ListOrderResponse
+    if err := json.NewDecoder(resp.Body).Decode(&listOrderResp); err != nil {
+        return models.ListOrderResponse{}, err
+    }
+
+	return listOrderResp, nil
 
 }

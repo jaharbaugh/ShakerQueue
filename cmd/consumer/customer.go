@@ -13,7 +13,35 @@ import (
 	"github.com/jaharbaugh/ShakerQueue/internal/app"
 )
 
-func ViewMenu(){
+func GetRecpies(sessionClient app.Client) (models.ListMenuResponse, error) {
+    req, err := http.NewRequest(
+        http.MethodGet,
+        sessionClient.BaseURL+"/menu",
+        bytes.NewBuffer(nil),
+    )
+    if err != nil {
+        return models.ListMenuResponse{}, err
+    }
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+ sessionClient.BearerToken)
+
+	resp, err := sessionClient.HTTPClient.Do(req)
+    if err != nil {
+        return models.ListMenuResponse{}, err
+    }
+    defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+        return models.ListMenuResponse{}, fmt.Errorf("Recipe Retrieval Failed: %s", resp.Status)
+    }
+
+	var listMenuResp models.ListMenuResponse
+    if err := json.NewDecoder(resp.Body).Decode(&listMenuResp); err != nil {
+        return models.ListMenuResponse{}, err
+    }
+
+	return listMenuResp, nil
 
 }
 
