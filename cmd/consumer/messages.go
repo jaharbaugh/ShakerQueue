@@ -12,35 +12,35 @@ import (
 )
 
 func ConsumerWelcome() (models.LogInRequest, error) {
-	fmt.Println("Welcome to ShakerQueue!")
-	fmt.Println("Please enter your email:")
+	fmt.Println("🍸 Welcome to ShakerQueue!")
+	fmt.Println("The bar is open. Let's get you a seat.")
+	fmt.Println("What's your email?")
 	email := GetInput()
 	if len(email) == 0 {
-		return models.LogInRequest{}, errors.New("you must enter an email. goodbye")
+		return models.LogInRequest{}, errors.New("no tab, no service — you need to enter an email")
 	}
-	fmt.Println("Please enter your password:")
+	fmt.Println("🍸Please enter your password:")
 	password := GetInput()
 	if len(password) == 0 {
-		return models.LogInRequest{}, errors.New("you must enter an email. goodbye")
+		return models.LogInRequest{}, errors.New("no tab, no service — you need to enter an email")
 	}
 	creds := models.LogInRequest{
 		Email:    email[0],
 		Password: password[0],
 	}
-	//fmt.Printf("Welcome, %s!\n", username)
-	//PrintClientHelp()
+
 	return creds, nil
 }
 
 func ConsumerGetNewUsername() (string, error) {
-	fmt.Println("Please enter your desired username:")
+	fmt.Println("What should we call you?")
 	username := GetInput()
 	return username[0], nil
 }
 
 func PrintCustomerCommands() {
 	fmt.Println("🍹 Customer commands:")
-	fmt.Println("* menu   — see what’s on tap")
+	fmt.Println("* menu   — see what's on tap")
 	fmt.Println("* order  — place a drink order")
 	fmt.Println("* status — check on your drinks")
 	fmt.Println("* help   — how this place works")
@@ -54,7 +54,7 @@ func PrintCustomerHelp() {
 	fmt.Println("")
 	fmt.Println("* order:")
 	fmt.Println("    place a drink order with the bar")
-	fmt.Println("    one drink at a time — we’re classy like that")
+	fmt.Println("    one drink at a time — we're classy like that")
 	fmt.Println("")
 	fmt.Println("* status:")
 	fmt.Println("    check the status of all drinks under your tab")
@@ -92,9 +92,9 @@ func PrintEmployeeHelp() {
 
 func PrintAdminCommands() {
 	fmt.Println("🧾 Manager commands:")
-	fmt.Println("* health   — check the bar’s vitals")
+	fmt.Println("* health   — check the bar's vitals")
 	fmt.Println("* list     — see all orders")
-	fmt.Println("* role     — change a user’s role")
+	fmt.Println("* role     — change a user's role")
 	fmt.Println("* customer — view customer commands")
 	fmt.Println("* employee — view employee commands")
 	fmt.Println("* exit     — lock up for the night")
@@ -108,7 +108,7 @@ func PrintAdminHelp() {
 	fmt.Println("    view all orders and their current state")
 	fmt.Println("")
 	fmt.Println("* role:")
-	fmt.Println("    change a user’s role by their ID")
+	fmt.Println("    change a user's role by their ID")
 	fmt.Println("")
 	fmt.Println("* customer:")
 	fmt.Println("    show customer command list")
