@@ -9,7 +9,6 @@ type RegisterUserRequest struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
-	//Role	string	`json:"role"`
 }
 
 type RegisterUserResponse struct {
@@ -28,9 +27,7 @@ type LogInResponse struct {
 }
 
 type CreateOrderRequest struct {
-	//OrderID   uuid.UUID `json:"order_id"`
 	Name string `json:"name"`
-	//UserID: uuid.UUID `json:"user_id"`
 }
 
 type UpdateUserRoleRequest struct {
@@ -61,7 +58,8 @@ type OrderEvent struct {
 	OrderID  uuid.UUID
 	UserID   uuid.UUID
 	RecipeID uuid.UUID
-	Quantity int
+	Priority uint8
+	Delay int
 }
 
 type CreateCocktailRecipeRequest struct {

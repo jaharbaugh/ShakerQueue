@@ -21,7 +21,9 @@ func NewRouter(deps app.Dependencies) (http.Handler, error) {
 	mux.HandleFunc("/menu", handlers.AuthMiddleware(deps, handlers.HandleListRecipes(deps)))
 
 	//Employee Endpoints
-	mux.HandleFunc("/orders/complete", handlers.HandleCompleteOrder(deps))
+	mux.HandleFunc("/orders/start", handlers.AuthMiddleware(deps, handlers.HandleStartOrder(deps)))
+	mux.HandleFunc("/orders/complete", handlers.AuthMiddleware(deps, handlers.HandleCompleteOrder(deps)))
+	//mux.HandleFunc("/orders/complete", handlers.HandleCompleteOrder(deps))
 	mux.HandleFunc("/menu/add", handlers.AuthMiddleware(deps, handlers.HandleListRecipes(deps)))
 
 

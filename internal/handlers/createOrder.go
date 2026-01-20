@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"context"
+	//"context"
 	"encoding/json"
 	"net/http"
 
@@ -40,17 +40,36 @@ func HandleCreateOrder(deps app.Dependencies) http.HandlerFunc {
 			return
 		}
 		
-		cocktailRecipe, err := deps.Queries.GetRecipeByName(context.Background(), newOrderRequest.Name)
+		cocktailRecipe, err := deps.Queries.GetRecipeByName(req.Context(), newOrderRequest.Name)
 		if err != nil {
 			RespondWithError(w, http.StatusBadRequest, "Could not find cocktail recipe", err)
+			return
 		}
 		
-		newOrder, err := deps.Queries.CreateOrder(context.Background(), database.CreateOrderParams{
+		var priority int
+		var delay int
+		switch cocktailRecipe.Build{
+		case database.BuildTypeShaken:
+			priority = 5
+			delay = 45
+		case database.BuildTypeStirred:
+			priority = 3
+			delay = 30
+		case database.BuildTypeCollins:
+			priority = 1
+			delay = 15
+		case database.BuildTypeSour:
+			priority = 8
+			delay = 60
+		default:
+			RespondWithError(w, http.StatusBadRequest, "Unknown build type", nil)
+			return
+		} 
+
+		newOrder, err := deps.Queries.CreateOrder(req.Context(), database.CreateOrderParams{
 			ID:       uuid.New(),
 			UserID:   userID,
 			RecipeID: cocktailRecipe.ID,
-			//Quantity: newOrderRequest.Quantity,
-			//Status: database.StatusPending,
 		})
 		if err != nil {
 			RespondWithError(w, http.StatusInternalServerError, "Could not create new order", err)
@@ -61,7 +80,8 @@ func HandleCreateOrder(deps app.Dependencies) http.HandlerFunc {
 			OrderID:  newOrder.ID,
 			UserID:   newOrder.UserID,
 			RecipeID: newOrder.RecipeID,
-			//Quantity: newOrder.Quantity,
+			Priority: uint8(priority),
+			Delay: uint8(delay),
 		}
 
 		err = queue.PublishJSON(
@@ -69,6 +89,8 @@ func HandleCreateOrder(deps app.Dependencies) http.HandlerFunc {
 			queue.ExchangeDirect,
 			"order.created",
 			event,
+			uint8(priority),
+			uint8(delay),
 		)
 		if err != nil {
 			RespondWithError(w, http.StatusInternalServerError, "Could not publish order event", err)

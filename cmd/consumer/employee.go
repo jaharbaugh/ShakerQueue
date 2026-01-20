@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"encoding/json"
 	"bytes"
-	//"time"
+	"time"
 	//"log"
 
 	"github.com/jaharbaugh/ShakerQueue/internal/app"
@@ -36,7 +36,7 @@ func ProcessOrder(sessionClient app.Client) func(models.OrderEvent) queue.Acktyp
 		fmt.Printf("Processing order %s\n", event.OrderID)
 
 		url := fmt.Sprintf(
-			"%s/orders/complete?id=%s",
+			"%s/orders/start?id=%s",
 			sessionClient.BaseURL,
 			event.OrderID,
 		)
@@ -62,12 +62,31 @@ func ProcessOrder(sessionClient app.Client) func(models.OrderEvent) queue.Acktyp
 		}
 		defer resp.Body.Close()
 
-		if resp.StatusCode != http.StatusNoContent {
+		if resp.StatusCode != http.StatusOK {
 			fmt.Printf(
 				"Failed to complete order %s: status %d\n",
 				event.OrderID,
 				resp.StatusCode,
 			)
+			return queue.NackRequeue
+		}
+
+		time.Sleep(time.Duration(event.Delay) * time.Second)
+
+		url = fmt.Sprintf(
+			"%s/orders/complete?id=%s",
+			sessionClient.BaseURL,
+			event.OrderID,
+		)
+
+		req, err = http.NewRequestWithContext(
+			context.Background(),
+			http.MethodPost,
+			url,
+			nil,
+		)
+		if err != nil {
+			fmt.Printf("Failed to create request: %v\n", err)
 			return queue.NackRequeue
 		}
 
