@@ -1,8 +1,8 @@
 package main
 
-import(
-	"fmt"
+import (
 	"bufio"
+	"fmt"
 	"os"
 	"strings"
 	//"context"
@@ -24,7 +24,7 @@ func ConsumerWelcome() (models.LogInRequest, error) {
 		return models.LogInRequest{}, errors.New("you must enter an email. goodbye")
 	}
 	creds := models.LogInRequest{
-		Email: email[0],
+		Email:    email[0],
 		Password: password[0],
 	}
 	//fmt.Printf("Welcome, %s!\n", username)
@@ -32,83 +32,95 @@ func ConsumerWelcome() (models.LogInRequest, error) {
 	return creds, nil
 }
 
-func ConsumerGetNewUsername() (string, error){
+func ConsumerGetNewUsername() (string, error) {
 	fmt.Println("Please enter your desired username:")
 	username := GetInput()
 	return username[0], nil
 }
 
 func PrintCustomerCommands() {
-	fmt.Println("Possible commands:")
-	fmt.Println("* menu")
-	fmt.Println("* order")
-	fmt.Println("* status")
-	fmt.Println("* exit")
-	fmt.Println("* help")
+	fmt.Println("🍹 Customer commands:")
+	fmt.Println("* menu   — see what’s on tap")
+	fmt.Println("* order  — place a drink order")
+	fmt.Println("* status — check on your drinks")
+	fmt.Println("* help   — how this place works")
+	fmt.Println("* exit   — close your tab")
 }
 
 func PrintCustomerHelp() {
-	fmt.Println("Possible commands:")
+	fmt.Println("🍹 Customer commands:")
 	fmt.Println("* menu:")
-	fmt.Println("    view all cocktails available to order")
-	fmt.Println("* order: ")
-	fmt.Println("    adds a new order to the queue")
-	fmt.Println("    Only one drink at a time, please")
+	fmt.Println("    browse the cocktail menu")
+	fmt.Println("")
+	fmt.Println("* order:")
+	fmt.Println("    place a drink order with the bar")
+	fmt.Println("    one drink at a time — we’re classy like that")
+	fmt.Println("")
 	fmt.Println("* status:")
-	fmt.Println("    checks the status of all orders under your ID")
+	fmt.Println("    check the status of all drinks under your tab")
+	fmt.Println("")
 	fmt.Println("* exit:")
-	fmt.Println(" 	  exits the client")
+	fmt.Println("    close your tab and leave the bar")
+	fmt.Println("")
 	fmt.Println("* help:")
-	fmt.Println("     prints the help menu")
+	fmt.Println("    show this menu again")
 }
 
 func PrintEmployeeCommands() {
-	fmt.Println("Possible commands:")
-	fmt.Println("* make")
-	fmt.Println("* add")
-	fmt.Println("* exit")
-	fmt.Println("* help")
+	fmt.Println("🍺 Bartender commands:")
+	fmt.Println("* make  — start mixing drinks and getting paid")
+	fmt.Println("* add   — add a new cocktail recipe to the menu")
+	fmt.Println("* help  — refresher on bar duties")
+	fmt.Println("* exit  — clock out")
 }
 
 func PrintEmployeeHelp() {
-	fmt.Println("Possible commands:")
-	fmt.Println("* make: ")
-	fmt.Println("    subscribes to the queue of active orders")
-	fmt.Println("    Only one drink at a time, please")
+	fmt.Println("🍺 Bartender commands:")
+	fmt.Println("* make:")
+	fmt.Println("    hop behind the bar and start serving orders")
+	fmt.Println("    one drink at a time — no spills")
+	fmt.Println("")
 	fmt.Println("* add:")
-	fmt.Println("    creates new cocktail recipes to be ordered")
+	fmt.Println("    create a new cocktail recipe for the menu")
+	fmt.Println("")
 	fmt.Println("* exit:")
-	fmt.Println(" 	  exits the client")
+	fmt.Println("    clock out and leave the bar")
+	fmt.Println("")
 	fmt.Println("* help:")
-	fmt.Println("     prints the help menu")
+	fmt.Println("    show this menu again")
 }
 
 func PrintAdminCommands() {
-	fmt.Println("Possible commands:")
-	fmt.Println("* health")
-	fmt.Println("* list")
-	fmt.Println("* role")
-	fmt.Println("* exit")
-	fmt.Println("* customer")
-	fmt.Println("* employee")
+	fmt.Println("🧾 Manager commands:")
+	fmt.Println("* health   — check the bar’s vitals")
+	fmt.Println("* list     — see all orders")
+	fmt.Println("* role     — change a user’s role")
+	fmt.Println("* customer — view customer commands")
+	fmt.Println("* employee — view employee commands")
+	fmt.Println("* exit     — lock up for the night")
 }
 func PrintAdminHelp() {
-	fmt.Println("Possible commands:")
-	fmt.Println("* health: ")
-	fmt.Println("    view server health data")
+	fmt.Println("🧾 Manager commands:")
+	fmt.Println("* health:")
+	fmt.Println("    check server health and system status")
+	fmt.Println("")
 	fmt.Println("* list:")
-	fmt.Println("    List all order and their status")
+	fmt.Println("    view all orders and their current state")
+	fmt.Println("")
 	fmt.Println("* role:")
-	fmt.Println(" 	  Change the role of user by their ID")
-	fmt.Println("* exit:")
-	fmt.Println(" 	  exits the client")
+	fmt.Println("    change a user’s role by their ID")
+	fmt.Println("")
 	fmt.Println("* customer:")
-	fmt.Println("     prints customer commands")
+	fmt.Println("    show customer command list")
+	fmt.Println("")
 	fmt.Println("* employee:")
-	fmt.Println("     prints employee commands")
+	fmt.Println("    show employee command list")
+	fmt.Println("")
+	fmt.Println("* exit:")
+	fmt.Println("    shut things down and close the bar")
 }
 func GetInput() []string {
-	fmt.Print("> ")
+	fmt.Print("🍸> ")
 	scanner := bufio.NewScanner(os.Stdin)
 	scanned := scanner.Scan()
 	if !scanned {
@@ -119,3 +131,11 @@ func GetInput() []string {
 	return strings.Fields(line)
 }
 
+func Section(title string) {
+	fmt.Println()
+	fmt.Println("===", title, "===")
+}
+
+func Divider() {
+	fmt.Println("----------------------------")
+}

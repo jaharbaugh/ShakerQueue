@@ -1,11 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
-	"fmt"
-	"bytes"
 	//"context"
 
 	//"github.com/jaharbaugh/ShakerQueue/internal/database"
@@ -14,73 +14,73 @@ import (
 )
 
 func Login(serverURL string, creds models.LogInRequest) (*models.LogInResponse, error) {
-    body, err := json.Marshal(creds)
-    if err != nil {
-        return nil, err
-    }
+	body, err := json.Marshal(creds)
+	if err != nil {
+		return nil, err
+	}
 
-    req, err := http.NewRequest(
-        http.MethodPost,
-        serverURL+"/login",
-        bytes.NewBuffer(body),
-    )
-    if err != nil {
-        return nil, err
-    }
+	req, err := http.NewRequest(
+		http.MethodPost,
+		serverURL+"/login",
+		bytes.NewBuffer(body),
+	)
+	if err != nil {
+		return nil, err
+	}
 
-    req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Content-Type", "application/json")
 
-    client := &http.Client{Timeout: 10 * time.Second}
-    resp, err := client.Do(req)
-    if err != nil {
-        return nil, err
-    }
-    defer resp.Body.Close()
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
 
-    if resp.StatusCode != http.StatusOK {
-        return nil, fmt.Errorf("login failed: %s", resp.Status)
-    }
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("login failed: %s", resp.Status)
+	}
 
-    var loginResp models.LogInResponse
-    if err := json.NewDecoder(resp.Body).Decode(&loginResp); err != nil {
-        return nil, err
-    }
+	var loginResp models.LogInResponse
+	if err := json.NewDecoder(resp.Body).Decode(&loginResp); err != nil {
+		return nil, err
+	}
 
-    return &loginResp, nil
+	return &loginResp, nil
 }
 
 func RegisterUser(serverURL string, creds models.RegisterUserRequest) (*models.RegisterUserResponse, error) {
 	body, err := json.Marshal(creds)
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    req, err := http.NewRequest(
-        http.MethodPost,
-        serverURL+"/register",
-        bytes.NewBuffer(body),
-    )
-    if err != nil {
-        return nil, err
-    }
-	
+	req, err := http.NewRequest(
+		http.MethodPost,
+		serverURL+"/register",
+		bytes.NewBuffer(body),
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{Timeout: 10 * time.Second}
-    resp, err := client.Do(req)
-    if err != nil {
-        return nil, err
-    }
-    defer resp.Body.Close()
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
 
-    if resp.StatusCode != http.StatusCreated {
-        return nil, fmt.Errorf("registration failed: %s", resp.Status)
-    }
+	if resp.StatusCode != http.StatusCreated {
+		return nil, fmt.Errorf("registration failed: %s", resp.Status)
+	}
 
 	var registrationResp models.RegisterUserResponse
-    if err := json.NewDecoder(resp.Body).Decode(&registrationResp); err != nil {
-        return nil, err
-    }
+	if err := json.NewDecoder(resp.Body).Decode(&registrationResp); err != nil {
+		return nil, err
+	}
 
-    return &registrationResp, nil
+	return &registrationResp, nil
 }

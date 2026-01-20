@@ -12,11 +12,11 @@ import (
 	"github.com/jaharbaugh/ShakerQueue/internal/queue"
 )
 
-func JoinQueue(sessionClient app.Client) error{
+func JoinQueue(sessionClient app.Client) error {
 	err := queue.SubscribeJSON(
 		sessionClient.AMQPConn,
 		queue.ExchangeDirect,
-		"orders.employee",      
+		"orders.employee",
 		"orders.created",
 		queue.SimpleQueueDurable,
 		ProcessOrder(sessionClient),

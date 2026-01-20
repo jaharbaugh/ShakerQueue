@@ -1,9 +1,9 @@
 package main
 
-import(
+import (
+	"errors"
 	"fmt"
 	"log"
-	"errors"
 	"net/http"
 	"time"
 
@@ -14,10 +14,12 @@ import(
 	"github.com/jaharbaugh/ShakerQueue/internal/database"
 	"github.com/jaharbaugh/ShakerQueue/internal/models"
 )
+
 const urlAddress = "http://localhost:8080"
+
 func main() {
 	fmt.Println("Welcome to the ShakerQueue")
-	
+
 	//Connect to Rabbitmq
 	connectionString := "amqp://guest:guest@localhost:5672/"
 	connection, err := amqp.Dial(connectionString)
@@ -39,13 +41,13 @@ func main() {
 
 	//Request Login from Server
 	loginResponse, err := Login(urlAddress, loginCreds)
-	if err != nil{
-		if errors.Is(err, models.ErrUserNotFound){
+	if err != nil {
+		if errors.Is(err, models.ErrUserNotFound) {
 			fmt.Println("No account found. Registering new user:")
 			username, err := ConsumerGetNewUsername()
 			registerCreds := models.RegisterUserRequest{
-				Username:	username,
-				Email:	loginCreds.Email,
+				Username: username,
+				Email:    loginCreds.Email,
 				Password: loginCreds.Password,
 			}
 			regResp, err := RegisterUser(urlAddress, registerCreds)
@@ -57,139 +59,156 @@ func main() {
 				Token: regResp.Token,
 			}
 		} else {
-		log.Fatalf("login failed: %v", err)
+			log.Fatalf("login failed: %v", err)
 		}
-	
+
 	}
 	//Create Session State
 	sessionClient := app.Client{
-		BaseURL: urlAddress,
+		BaseURL:     urlAddress,
 		BearerToken: loginResponse.Token,
-		HTTPClient: &http.Client{Timeout: 10 * time.Second},
-		AMQPChan: ch,
-		AMQPConn: connection,
+		HTTPClient:  &http.Client{Timeout: 10 * time.Second},
+		AMQPChan:    ch,
+		AMQPConn:    connection,
 	}
 
-	
 	//Infinite Block
-	
-		switch loginResponse.User.Role{
-		case database.UserRoleAdmin:
-			for {
-				PrintAdminCommands()
-				newRequest:= GetInput()
-				switch newRequest[0]{
-				case "health":
-					fmt.Println("Checking Server Health")
-					health, err := Health(sessionClient)
-					if err != nil{
-						log.Fatalf("Could not get health info: %v", err)
-					}
-					fmt.Sprintf(health)
-					fmt.Println("------")
-					
-				case "list":
-					fmt.Println("Fetching all orders")
-					orders, err := ListOrders(sessionClient)
-					if err != nil{
-						fmt.Printf("Could not retrieve orders: %v \n", err)
-						return
-					}
 
-					for _, order := range orders.Orders{
-						fmt.Printf("%v\n", order.ID)
-						fmt.Printf("%v\n", order.Status)
-						fmt.Printf("%v\n", order.CreatedAt)
-						fmt.Printf("%v\n", order.RecipeID)
-						fmt.Printf("%v\n", order.UserID)
-						fmt.Println("-------")
-					}
-				case "role":
-					fmt.Println("What is the user's email?")
-					email := GetInput()
-					fmt.Println("What is their new role?")
-					newRole := GetInput()
-					err := UpdateUserRole(sessionClient, email[0], newRole[0])
-					if err != nil{
-						fmt.Printf("Could not upadate user role: %v \n", err)
-						return
-					}
-					fmt.Println("User role updated successfuly")
-				case "exit":
+	switch loginResponse.User.Role {
+	case database.UserRoleAdmin:
+		for {
+			fmt.Println()
+			fmt.Println("🧾 Manager Console — ShakerQueue")
+			PrintAdminCommands()
+			newRequest := GetInput()
+			switch newRequest[0] {
+			case "health":
+				fmt.Println("🩺 Running a systems check...")
+				health, err := Health(sessionClient)
+				if err != nil {
+					log.Fatalf("❌ Could not get health info: %v", err)
+				}
+				fmt.Println("All systems reporting in:")
+				fmt.Println(health)
+				Divider()
+
+			case "list":
+				fmt.Println("📋 Pulling the full order ledger...")
+				orders, err := ListOrders(sessionClient)
+				if err != nil {
+					fmt.Printf("❌ Could not retrieve orders: %v \n", err)
 					return
-				case "customer":
-					PrintCustomerHelp()
-					
-				case "employee":
-					PrintEmployeeHelp()
-					
+				}
+				for _, order := range orders.Orders {
+					fmt.Println("Order ID:   ", order.ID)
+					fmt.Println("Status:     ", order.Status)
+					fmt.Println("Created At: ", order.CreatedAt)
+					fmt.Println("Recipe ID:  ", order.RecipeID)
+					fmt.Println("User ID:    ", order.UserID)
+					Divider()
+				}
+
+			case "role":
+				fmt.Println("🔐 User management")
+				fmt.Println("Whose role are we changing? (email)")
+				email := GetInput()
+				fmt.Println("What’s their new role?")
+				newRole := GetInput()
+				err := UpdateUserRole(sessionClient, email[0], newRole[0])
+				if err != nil {
+					fmt.Printf("❌ Could not update user role: %v \n", err)
+					return
+				}
+				fmt.Println("✅ Role updated. Paperwork signed and filed.")
+
+			case "exit":
+				fmt.Println("Locking the office. See you tomorrow.")
+				return
+
+			case "customer":
+				PrintCustomerHelp()
+
+			case "employee":
+				PrintEmployeeHelp()
 			}
 		}
-		case database.UserRoleCustomer:
-			for {
-				PrintCustomerCommands()
-				newRequest := GetInput()
-				switch newRequest[0]{
-				case "menu":
-					fmt.Println("Fetching all menu items")
-					recipes, err := GetRecpies(sessionClient)
-					if err != nil{
-						fmt.Printf("Could not retrieve menu: %v \n", err)
-						return
-					}
 
-					for _, recipe := range recipes.Menu{
-						//fmt.Printf("%v\n", recipe.ID)
-						fmt.Printf("%v\n", recipe.Name)
-						fmt.Println("-------")
-					}
-				case "order":
-					fmt.Println("What drink would you like?")
-					cocktail := GetInput()
-					CreateOrder(sessionClient, cocktail[0])
-					fmt.Println("Order Created Successfully")
-				case "status":
-					fmt.Println("Fetching all of your orders")
-					orders, err := OrderStatus(sessionClient)
-					if err != nil{
-						fmt.Printf("Could not retrieve orders: %v \n", err)
-						return
-					}
+	case database.UserRoleCustomer:
+		for {
+			fmt.Println()
+			fmt.Println("🍹 Welcome back to the bar")
+			PrintCustomerCommands()
+			newRequest := GetInput()
+			switch newRequest[0] {
+			case "menu":
+				fmt.Println("📖 Checking what’s on the menu...")
+				recipes, err := GetRecpies(sessionClient)
+				if err != nil {
+					fmt.Printf("❌ Could not retrieve menu: %v \n", err)
+					return
+				}
+				for _, recipe := range recipes.Menu {
+					fmt.Println("•", recipe.Name)
+				}
+				Divider()
 
-					for _, order := range orders.Orders{
-						fmt.Printf("%v\n", order.ID)
-						fmt.Printf("%v\n", order.Status)
-						fmt.Printf("%v\n", order.CreatedAt)
-						fmt.Printf("%v\n", order.RecipeID)
-						//fmt.Printf("%v\n", order.UserID)
-						fmt.Println("-------")
-					}
-				case "exit":
+			case "order":
+				fmt.Println("🍸 What’ll it be?")
+				cocktail := GetInput()
+				CreateOrder(sessionClient, cocktail[0])
+				fmt.Println("✅ Order sent to the bar. The bartender’s on it.")
+
+			case "status":
+				fmt.Println("🧾 Checking your tab...")
+				orders, err := OrderStatus(sessionClient)
+				if err != nil {
+					fmt.Printf("❌ Could not retrieve orders: %v \n", err)
 					return
-				case "help":
-					PrintCustomerHelp()
-					
 				}
-			}
-		case database.UserRoleEmployee:
-			for {
-				PrintEmployeeCommands()
-				newRequest := GetInput()
-				switch newRequest[0]{
-				case "make":
-					err := JoinQueue(sessionClient)
-					if err != nil{
-						log.Fatalf("Could not subscribe: %v", err)
-					}
-				case "add":
-					// TODO: implement
-				case "exit":
-					return
-				case "help":
-					PrintEmployeeHelp()
-					
+				for _, order := range orders.Orders {
+					fmt.Println("Order ID:   ", order.ID)
+					fmt.Println("Status:     ", order.Status)
+					fmt.Println("Placed At:  ", order.CreatedAt)
+					fmt.Println("Drink ID:   ", order.RecipeID)
+					Divider()
 				}
+
+			case "exit":
+				fmt.Println("Thanks for stopping by — tab closed 🍻")
+				return
+
+			case "help":
+				PrintCustomerHelp()
 			}
-		default: select {}
 		}
+
+	case database.UserRoleEmployee:
+		for {
+			fmt.Println()
+			fmt.Println("🍺 Bartender Console — Clocked In")
+			PrintEmployeeCommands()
+			newRequest := GetInput()
+			switch newRequest[0] {
+			case "make":
+				fmt.Println("🍹 Grabbing the shaker and hopping behind the bar...")
+				err := JoinQueue(sessionClient)
+				if err != nil {
+					log.Fatalf("❌ Could not join the queue: %v", err)
+				}
+
+			case "add":
+				fmt.Println("🧪 Recipe creation coming soon — stay tuned.")
+
+			case "exit":
+				fmt.Println("Clocking out. Bar’s in good hands.")
+				return
+
+			case "help":
+				PrintEmployeeHelp()
+			}
+		}
+
+	default:
+		select {}
+	}
 }

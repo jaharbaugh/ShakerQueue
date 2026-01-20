@@ -22,6 +22,7 @@ func NewRouter(deps app.Dependencies) (http.Handler, error) {
 
 	//Employee Endpoints
 	mux.HandleFunc("/orders/complete", handlers.HandleCompleteOrder(deps))
+	mux.HandleFunc("/menu/add", handlers.AuthMiddleware(deps, handlers.HandleListRecipes(deps)))
 
 
 	//Shared Endpoints
