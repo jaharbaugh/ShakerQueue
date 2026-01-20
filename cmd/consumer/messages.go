@@ -139,3 +139,19 @@ func Section(title string) {
 func Divider() {
 	fmt.Println("----------------------------")
 }
+
+
+func SplitAndTrim(s string, sep string) []string {
+	raw := []string{}
+	for _, part := range Split(s, sep) {
+		raw = append(raw, Trim(part))
+	}
+	return raw
+}
+
+func Split(s, sep string) []string {
+	return []string(strings.Split(s, sep))
+}
+func Trim(s string) string {
+	return strings.TrimSpace(s)
+}

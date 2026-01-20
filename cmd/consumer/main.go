@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"time"
+	//"strings"
 
 	_ "github.com/lib/pq"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -197,10 +198,33 @@ func main() {
 				}
 
 			case "add":
-				fmt.Println("🧪 Recipe creation coming soon — stay tuned.")
+				//fmt.Println("🧪 Recipe creation coming soon — stay tuned.")
+				fmt.Println("What is the name of the cocktail?")
+				name := GetInput()
+				//name = name[0]
+				fmt.Println("How do you build it?")
+				buildType := GetInput()
+				//buildType = buildType[0]
+				fmt.Println("What are the ingredients and how much do you need of each?")
+				ingredients := GetInput()
+				ingredientsString := ingredients[0]
+				parts := make(map[string]string)
+				for _, item := range SplitAndTrim(ingredientsString, ",") {
+					kv := SplitAndTrim(item, ":")
+					if len(kv) == 2 {
+						parts[kv[0]] = kv[1]
+					}
+				}
+				
+				err := AddCocktailRecipe(sessionClient, name[0], parts, buildType[0])
+				if err != nil {
+    				fmt.Printf("❌ Could not add recipe: %v\n", err)
+					return
+				}
+				fmt.Println("✅ Cocktail recipe added successfully!")
 
 			case "exit":
-				fmt.Println("Clocking out. Bar’s in good hands.")
+				fmt.Println("Clocking out. Bar's in good hands.")
 				return
 
 			case "help":

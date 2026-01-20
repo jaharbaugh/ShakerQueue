@@ -34,8 +34,8 @@ type CreateOrderRequest struct {
 }
 
 type UpdateUserRoleRequest struct {
-	Email    string `json:"email"`
-	NewRole string        `json:"new_role"`
+	Email   string `json:"email"`
+	NewRole string `json:"new_role"`
 }
 
 type UpdateUserRoleResponse struct {
@@ -43,18 +43,18 @@ type UpdateUserRoleResponse struct {
 }
 
 type ProcessOrderRequest struct {
-	OrderID	uuid.UUID `json:"order_id"`
+	OrderID uuid.UUID `json:"order_id"`
 }
 type ListOrderResponse struct {
-	Orders	[]database.Order	`json:"orders"`
+	Orders []database.Order `json:"orders"`
 }
 
 type ListMenuResponse struct {
-	Menu	[]database.CocktailRecipe	`json:"menu"`
+	Menu []database.CocktailRecipe `json:"menu"`
 }
 
 type OrderStatusResponse struct {
-	Orders	[]database.Order	`json:"orders"`
+	Orders []database.Order `json:"orders"`
 }
 
 type OrderEvent struct {
@@ -64,6 +64,15 @@ type OrderEvent struct {
 	Quantity int
 }
 
-type CreateOrderResponse struct {
+type CreateCocktailRecipeRequest struct {
+	Name        string            `json:"name"`
+	Ingredients map[string]string `json:"ingredients"`
+	BuildType   string            `json:"build_type"`
 }
 
+type CreateCocktailRecipeResponse struct {
+	Recipe database.CocktailRecipe `json:"recipe"`
+}
+
+type CreateOrderResponse struct {
+}

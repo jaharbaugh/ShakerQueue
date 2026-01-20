@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"encoding/json"
+	"bytes"
 	//"time"
 	//"log"
 
@@ -73,3 +75,42 @@ func ProcessOrder(sessionClient app.Client) func(models.OrderEvent) queue.Acktyp
 		return queue.Ack
 	}
 }
+
+func AddCocktailRecipe(sessionClient app.Client, name string, ingredients map[string]string, buildType string) error {
+
+	params := models.CreateCocktailRecipeRequest{
+		Name: name,
+		Ingredients: ingredients,
+		BuildType: buildType,
+	}
+
+	body, err := json.Marshal(params)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(
+		http.MethodPost,
+		sessionClient.BaseURL+"/menu/add",
+		bytes.NewBuffer(body),
+	)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+sessionClient.BearerToken)
+
+	resp, err := sessionClient.HTTPClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("User role update failed: %s", resp.Status)
+	}
+
+	return nil
+}
+
