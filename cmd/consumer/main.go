@@ -149,7 +149,21 @@ func main() {
 					CreateOrder(sessionClient, cocktail[0])
 					fmt.Println("Order Created Successfully")
 				case "status":
-					// TODO: implement
+					fmt.Println("Fetching all of your orders")
+					orders, err := OrderStatus(sessionClient)
+					if err != nil{
+						fmt.Printf("Could not retrieve orders: %v \n", err)
+						return
+					}
+
+					for _, order := range orders.Orders{
+						fmt.Printf("%v\n", order.ID)
+						fmt.Printf("%v\n", order.Status)
+						fmt.Printf("%v\n", order.CreatedAt)
+						fmt.Printf("%v\n", order.RecipeID)
+						//fmt.Printf("%v\n", order.UserID)
+						fmt.Println("-------")
+					}
 				case "exit":
 					return
 				case "help":
@@ -168,8 +182,6 @@ func main() {
 						log.Fatalf("Could not subscribe: %v", err)
 					}
 				case "add":
-					// TODO: implement
-				case "status":
 					// TODO: implement
 				case "exit":
 					return

@@ -17,6 +17,7 @@ func NewRouter(deps app.Dependencies) (http.Handler, error) {
 	
 	//Customer Endpoints
 	mux.HandleFunc("/orders/create", handlers.AuthMiddleware(deps, handlers.HandleCreateOrder(deps)))
+	mux.HandleFunc("/orders/status", handlers.AuthMiddleware(deps, handlers.HandleOrderStatus(deps)))
 	mux.HandleFunc("/menu", handlers.AuthMiddleware(deps, handlers.HandleListRecipes(deps)))
 
 	//Employee Endpoints

@@ -53,6 +53,10 @@ type ListMenuResponse struct {
 	Menu	[]database.CocktailRecipe	`json:"menu"`
 }
 
+type OrderStatusResponse struct {
+	Orders	[]database.Order	`json:"orders"`
+}
+
 type OrderEvent struct {
 	OrderID  uuid.UUID
 	UserID   uuid.UUID

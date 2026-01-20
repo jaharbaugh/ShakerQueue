@@ -87,6 +87,33 @@ func CreateOrder(sessionClient app.Client, cocktail string) (*models.CreateOrder
     return &createOrderResp, nil
 }
 
-func ViewOrders(){
+func OrderStatus(sessionClient app.Client) (models.OrderStatusResponse, error) {
+    req, err := http.NewRequest(
+        http.MethodGet,
+        sessionClient.BaseURL+"/order/status",
+        bytes.NewBuffer(nil),
+    )
+    if err != nil {
+        return models.OrderStatusResponse{}, err
+    }
 
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+ sessionClient.BearerToken)
+
+	resp, err := sessionClient.HTTPClient.Do(req)
+    if err != nil {
+        return models.OrderStatusResponse{}, err
+    }
+    defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+        return models.OrderStatusResponse{}, fmt.Errorf("Recipe Retrieval Failed: %s", resp.Status)
+    }
+
+	var OrderStatusResp models.OrderStatusResponse
+    if err := json.NewDecoder(resp.Body).Decode(&OrderStatusResp); err != nil {
+        return models.OrderStatusResponse{}, err
+    }
+
+	return OrderStatusResp, nil
 }
