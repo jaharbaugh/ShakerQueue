@@ -16,10 +16,3 @@ type Dependencies struct {
 	JWTSecret *string
 }
 
-/*type ConsumerDependencies struct {
-	//DB        *sql.DB
-	//Queries   *database.Queries
-	AMQPConn  *amqp.Connection
-	AMQPChan  *amqp.Channel
-	//JWTSecret *string
-}*/

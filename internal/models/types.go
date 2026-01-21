@@ -59,7 +59,7 @@ type OrderEvent struct {
 	UserID   uuid.UUID
 	RecipeID uuid.UUID
 	Priority uint8
-	Delay int
+	Delay uint8
 }
 
 type CreateCocktailRecipeRequest struct {

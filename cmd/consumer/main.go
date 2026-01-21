@@ -6,21 +6,27 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"os"
 	//"strings"
 
 	_ "github.com/lib/pq"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/joho/godotenv"
 	//"github.com/jaharbaugh/ShakerQueue/internal/queue"
 	"github.com/jaharbaugh/ShakerQueue/internal/app"
 	"github.com/jaharbaugh/ShakerQueue/internal/database"
 	"github.com/jaharbaugh/ShakerQueue/internal/models"
 )
 
-const urlAddress = "http://localhost:8080"
+//const urlAddress = "http://localhost:8080"
 
 func main() {
 	fmt.Println("Welcome to the ShakerQueue")
-
+	//Load .env values
+	if err := godotenv.Load(); err != nil {
+	log.Println("No .env file found, relying on environment variables")
+	}
+	urlAddress := os.Getenv("BASE_URL")
 	//Connect to Rabbitmq
 	connectionString := "amqp://guest:guest@localhost:5672/"
 	connection, err := amqp.Dial(connectionString)

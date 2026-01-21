@@ -74,6 +74,6 @@ func main() {
 	if err != nil{
 		log.Fatalf("Could not create a new router: %v", err)
 	}
-	http.ListenAndServe(":8080", router)
+	log.Fatal(http.ListenAndServe(":8080", router))
 
 }
