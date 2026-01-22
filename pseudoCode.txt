@@ -1,0 +1,28 @@
+1. Client places an order
+   - An HTTP request hits the server API.
+   - Server validates that the user (optional) and cocktail recipe exist.
+   - Server generates a UUID for the order.
+
+2. Order is persisted
+   - Server inserts the new order into the 'orders' table.
+   - Status is set to 'pending' and timestamps are recorded.
+   - PostgreSQL now holds the canonical record of the order.
+
+3. Event is published
+   - Server publishes a message to RabbitMQ containing the order_id and build_type.
+   - The client receives a response immediately.
+   - No blocking or long-running work occurs in the HTTP request.
+
+4. Worker consumes event
+   - The worker (client) pulls the message from RabbitMQ.
+   - Uses the order_id to fetch full order details from the database.
+   - Updates the order status to 'in_progress'.
+
+5. Order processing
+   - Worker simulates “making the cocktail.”
+   - Processing duration may depend on build_type (e.g., shaken vs stirred).
+   - Worker handles retries and potential errors if they occur.
+
+6. Completion or failure
+   - On success: order status is updated to 'complete' and completed_at timestamp is set.
+   - On failure: order status is set to 'failed', error_message is recorded, and the message may be retried or sent to a dead-letter queue.
